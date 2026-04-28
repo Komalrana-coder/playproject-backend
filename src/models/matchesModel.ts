@@ -9,6 +9,7 @@ interface BookingType {
   timeSlot: string[];
   gameType: string;
   players:string[];
+  paymentId:string,
 }
 
 const bookingSchema = new mongoose.Schema<BookingType>(
@@ -36,6 +37,10 @@ const bookingSchema = new mongoose.Schema<BookingType>(
     },
     duration: {
       type: Number,
+
+    },
+    paymentId:{
+      type:String,
 
     },
 
