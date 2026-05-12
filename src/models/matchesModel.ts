@@ -10,6 +10,8 @@ interface BookingType {
   gameType: string;
   players:string[];
   paymentId:string,
+  status:string,
+   
 }
 
 const bookingSchema = new mongoose.Schema<BookingType>(
@@ -39,6 +41,11 @@ const bookingSchema = new mongoose.Schema<BookingType>(
       type: Number,
 
     },
+    status: {
+    type: String,
+    enum: ["pending", "completed"],
+    default: "pending",
+  },
     paymentId:{
       type:String,
 
@@ -58,7 +65,7 @@ const bookingSchema = new mongoose.Schema<BookingType>(
    players: [
   {
     name: { type: String, required: true },
-    email: { type: String, required: true }
+  
   }
 ]
   },

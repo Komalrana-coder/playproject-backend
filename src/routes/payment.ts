@@ -20,16 +20,8 @@ router.post("/create-payment", async (req: any, res: Response) => {
         courtId: courtId,
         date: date,
         players: JSON.stringify(players),
-        
-
       },
     });
-
-
-
-
-
-
 
     res.json({
       clientSecret: paymentIntent.client_secret,
@@ -41,10 +33,17 @@ router.post("/create-payment", async (req: any, res: Response) => {
 
 router.post("/create-checkout-session", async (req: Request, res: Response) => {
   try {
-        // const { bookingId } = req.body;
+    const { amount, bookingId } = req.body; 
+
+    if (!amount) {
+      return res.status(400).json({ error: "Amount is required" });
+    }
+
+        
   const session = await stripe.checkout.sessions.create({
   payment_method_types: ["card"],
   mode: "payment",
+
 
   line_items: [
     {
@@ -53,23 +52,16 @@ router.post("/create-checkout-session", async (req: Request, res: Response) => {
         product_data: {
           name: "Venue Booking",
         },
-        unit_amount: 500 * 100,
+        unit_amount: amount * 100,
       },
       quantity: 1,
     },
   ],
 
   metadata: {
-
-    
-    // bookingId: req.body.bookingId, // 👈 ADD THIS
+    bookingId: req.body.bookingId, 
   },
-
-     
-       
-      
-
-  success_url: "http://localhost:3000/api/user/openMatches",
+  success_url: "http://localhost:3000/user/openMatches",
 });
     res.json({ url: session.url });
 

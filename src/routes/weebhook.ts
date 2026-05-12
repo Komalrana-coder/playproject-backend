@@ -29,54 +29,48 @@ export const handleWebhook = async (req: Request, res: Response) => {
 
 switch (event.type) {
 
-  // ✅ PaymentIntent flow (your current one)
+ 
   case "payment_intent.succeeded": {
     const paymentIntent = event.data.object as any;
     console.log("paymentIntent",paymentIntent)
-    console.log("Metadata:", paymentIntent.metadata); // debug
+    console.log("Metadata:", paymentIntent.metadata);
+   
+
 
     await handlePaymentSuccess(paymentIntent);
     break;
   }
 
-  // ✅ Checkout flow (NEW - add this)
-  case "checkout.session.completed": {
-    const session = event.data.object as any;
+  //  Checkout flow (NEW - add this)
+case "checkout.session.completed": {
+  const session = event.data.object as any;
 
-    const bookingId = session.metadata?.bookingId;
+  console.log("SESSION:", session);
+  console.log("METADATA:", session.metadata);
 
-    if (!bookingId) {
-      console.error("❌ No bookingId in checkout session metadata");
-      return;
-    }
+  const bookingId = session.metadata?.bookingId;
 
-    // prevent duplicate updates
-    const existing = await Booking.findOne({
-      paymentId: session.payment_intent,
-    });
-
-    if (existing) {
-      console.log("Booking already processed (checkout)");
-      return;
-    }
-
-    const updatedBooking = await Booking.findByIdAndUpdate(
-      bookingId,
-      {
-        paymentId: session.payment_intent,
-        paymentStatus: "paid",
-        status: "confirmed",
-      },
-      { new: true }
-    );
-
-    console.log("✅ Booking confirmed via checkout:", updatedBooking);
-
-    break;
+  if (!bookingId) {
+    console.error(" No bookingId in metadata");
+    return;
   }
 
+  const updatedBooking = await Booking.findByIdAndUpdate(
+    bookingId,
+    {
+      paymentId: session.payment_intent,
+      status: "completed",  
+    },
+    { new: true }
+  );
+
+  console.log("✅ Booking updated:", updatedBooking);
+
+  break;
+}
+
   case "payment_intent.payment_failed": {
-    console.log("❌ Payment Failed");
+    console.log("Payment Failed");
     break;
   }
 
@@ -88,6 +82,7 @@ switch (event.type) {
 };
 
 
+
 const handlePaymentSuccess = async (paymentIntent: any) => {
   try {
     const bookingId = paymentIntent.metadata?.bookingId;
@@ -97,7 +92,7 @@ const handlePaymentSuccess = async (paymentIntent: any) => {
       return;
     }
 
-    // ✅ prevent duplicate updates
+   
     const existing = await Booking.findOne({
       paymentId: paymentIntent.id,
     });
@@ -107,18 +102,18 @@ const handlePaymentSuccess = async (paymentIntent: any) => {
       return;
     }
 
-    // ✅ update existing booking
+    
     const updatedBooking = await Booking.findByIdAndUpdate(
       bookingId,
       {
         paymentId: paymentIntent.id,
         paymentStatus: "paid",
-        status: "confirmed",
+        status: "completed",
       },
       { new: true }
     );
 
-    console.log("Booking confirmed:", updatedBooking);
+    console.log("Booking completed:", updatedBooking);
 
   } catch (error) {
     console.error("DB Error:", error);

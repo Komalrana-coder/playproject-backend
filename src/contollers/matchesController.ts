@@ -15,7 +15,7 @@ export const createBooking = async (req: Request, res: Response) => {
       duration,
       timeSlot,
       gameType,
-      players
+      players,
       
     } = req.body;
 
@@ -53,6 +53,44 @@ const userId = user.id;
 
 
 
+
+export const updatePlayers = async (req: Request, res: Response) => {
+  try {
+    const { bookingId } = req.params;
+    const { players } = req.body;
+
+    if (!players || players.length === 0) {
+      return res.status(400).json({ message: "No players provided" });
+    }
+
+    const updatedBooking = await booking.findByIdAndUpdate(
+      bookingId,
+      {
+        $push: {
+          players: { $each: players }, 
+        },
+      },
+      { new: true }
+    );
+
+    if (!updatedBooking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+
+    res.status(200).json({
+      success: true,
+      booking: updatedBooking,
+    });
+  } catch (error: any) {
+    console.log("UPDATE PLAYERS ERROR:", error);
+
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
+
 export const getAllMatches = async (req: Request, res: Response) => {
   try {
     const page = Number(req.query.page) || 1;
@@ -75,14 +113,14 @@ export const getAllMatches = async (req: Request, res: Response) => {
       };
     }
 
-    const bookings = await Booking.find(query)
+    const bookings = await Booking.find(({ gameType: "public" }))
       .populate("user")
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: -1 });
 
   
-    const total = await Booking.countDocuments(query);
+    const total = await Booking.countDocuments(({ gameType: "public" }));
 
 
     const result = await Promise.all(
@@ -162,15 +200,15 @@ export const getMyBooking = async (req: Request, res: Response) => {
 //check user
 export const checkUser = async (req: Request, res: Response) => {
   try {
-    const { name, email } = req.body;
+    const { name } = req.body;
 
-    if (!name || !email) {
+    if (!name) {
       return res.status(400).json({ message: "Name and email required" });
     }
 
     const newUser = await User.create({
       name,
-      email,
+      
     });
 
     return res.status(201).json({
