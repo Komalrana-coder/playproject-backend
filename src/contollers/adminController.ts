@@ -128,6 +128,10 @@ export const addEmployee = async (req: Request, res: Response) => {
                 message: "email already exists"
             })
         }
+          const imagePath = req.file
+      ? `/uploads/${req.file.filename}`
+      : "/uploads/default.jpg";
+
         const hashedPassword = await bcrypt.hash(password, 10);
         const newEmployee = new Employee({
             name,
@@ -135,6 +139,7 @@ export const addEmployee = async (req: Request, res: Response) => {
             password: hashedPassword,
             phoneNumber,
             status,
+            image:imagePath,
            
         });
         await newEmployee.save();
@@ -230,12 +235,16 @@ export const getSingleEmployee =async(req:Request,res:Response)=>{
      if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: "Invalid ID" });
     }
-     const { _id, ...updateData } = req.body;
+    const updateData: any = { ...req.body };
+
+    if (req.file) {
+      updateData.image = `/uploads/${req.file.filename}`;
+    }
 
 
     const updatedEmployee = await Employee.findByIdAndUpdate(
       id,
-      req.body,
+      updateData,
       { new: true } 
     );
 

@@ -15,7 +15,7 @@ connectDB();
 const app = express();
 const port= 8000;
 app.use(cors({
-  origin: "*",
+  origin: "https://projectplay-fronend.vercel.app/",
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
 
 }));
@@ -28,6 +28,7 @@ app.post(
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
+app.use("/uploads", express.static("uploads"));
 
 app.get("/", (req, res) => {
   res.json({

@@ -1,5 +1,5 @@
 import express from "express"
-import { checkUser, createBooking, getAllMatches, getMyBooking, updatePlayers} from "../contollers/matchesController";
+import { checkUser, createBooking, getAllMatches,  getMonthlyStats, getMyBooking, updatePlayers} from "../contollers/matchesController";
 import { authMiddleware } from "../middlewares/auth";
 
 
@@ -10,5 +10,6 @@ router.get("/getAllMatches", authMiddleware,getAllMatches);
 router.get("/getMyBooking", authMiddleware,getMyBooking);
 router.post("/checkUser",checkUser)
 router.put("/updatePlayers/:bookingId", updatePlayers);
+router.get("/monthlyDailyStats", getMonthlyStats);
 export default router;
 

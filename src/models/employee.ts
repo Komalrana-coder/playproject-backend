@@ -8,6 +8,7 @@ interface Employee {
   phoneNumber:Number;
   status:string;
   otpExpiry: Date | null;
+  image:string;
 }
 
 const employeeSchema = new mongoose.Schema<Employee>({
@@ -21,6 +22,10 @@ const employeeSchema = new mongoose.Schema<Employee>({
     required: true,
     unique: true
   },
+   image: {
+  type: String,
+  default: "/uploads/default.jpg",
+},
   password: {
     type: String,
     required: true

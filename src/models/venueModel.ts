@@ -62,8 +62,8 @@ const venueSchema = new Schema<venue>({
 
   facilities:{
     type:[String],
-    
   },
+  
   employee:[{
     type:Schema.Types.ObjectId,
     ref:"employee"

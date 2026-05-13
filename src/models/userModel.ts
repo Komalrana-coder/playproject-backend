@@ -8,6 +8,7 @@ interface User {
   city:string;
   otp:Number | null;
   otpExpiry: Date | null;
+  image:string;
    }
 
 const userSchema = new mongoose.Schema<User>({
@@ -20,6 +21,10 @@ const userSchema = new mongoose.Schema<User>({
     type: String,
     
   }, 
+  image: {
+  type: String,
+  default: "/uploads/default.jpg",
+},
   name:{
     type:String,
     required:true

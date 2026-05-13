@@ -5,6 +5,8 @@ import User from "../models/userModel";
 import Venue from "../models/venueModel";
 
 
+
+
 export const createBooking = async (req: Request, res: Response) => {
   try {
 
@@ -53,7 +55,6 @@ const userId = user.id;
 
 
 
-
 export const updatePlayers = async (req: Request, res: Response) => {
   try {
     const { bookingId } = req.params;
@@ -63,23 +64,19 @@ export const updatePlayers = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "No players provided" });
     }
 
-    const updatedBooking = await booking.findByIdAndUpdate(
+    const match = await Booking.findByIdAndUpdate(
       bookingId,
-      {
-        $push: {
-          players: { $each: players }, 
-        },
-      },
+      { players }, 
       { new: true }
     );
 
-    if (!updatedBooking) {
-      return res.status(404).json({ message: "Booking not found" });
+    if (!Booking) {
+      return res.status(404).json({ message: "Match not found" });
     }
 
     res.status(200).json({
       success: true,
-      booking: updatedBooking,
+      match,
     });
   } catch (error: any) {
     console.log("UPDATE PLAYERS ERROR:", error);
@@ -217,5 +214,125 @@ export const checkUser = async (req: Request, res: Response) => {
     });
   } catch (error) {
     res.status(500).json({ message: "Error creating user" });
+  }
+};
+
+// export const getMonthlyStats = async (req: Request, res: Response) => {
+//   try {
+//     const matches = await Booking.find();
+
+//     const now = new Date();
+//     const currentMonth = now.getMonth(); // 0-based
+//     const currentYear = now.getFullYear();
+
+//     const daysInMonth = new Date(
+//       currentYear,
+//       currentMonth + 1,
+//       0
+//     ).getDate();
+
+//     const result = [];
+
+//     for (let i = 1; i <= daysInMonth; i++) {
+//       let padel = 0;
+//       let pickleball = 0;
+
+//       matches.forEach((match: any) => {
+//         if (!match.date) return;
+
+//         // ✅ SAFE DATE PARSE (NO STRING MATCH)
+//         const [y, m, d] = match.date.trim().split("-").map(Number);
+
+//         const matchDate = new Date(y, m - 1, d);
+
+//         if (
+//           matchDate.getFullYear() === currentYear &&
+//           matchDate.getMonth() === currentMonth &&
+//           matchDate.getDate() === i
+//         ) {
+//           if (match.game?.toLowerCase().trim() === "padel") padel++;
+//           if (match.game?.toLowerCase().trim() === "pickleball") pickleball++;
+//         }
+//       });
+
+//       result.push({
+//         day: i,
+//         padel,
+//         pickleball,
+//       });
+//     }
+
+//     console.log("FINAL DATA:", result);
+
+//     res.json(result);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ message: "Error fetching stats" });
+//   }
+// };
+
+
+
+export const getMonthlyStats = async (req: Request, res: Response) => {
+  console.log("API HIT ✅");
+  try {
+    const matches = await Booking.find();
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    const daysInMonth = new Date(
+      currentYear,
+      currentMonth + 1,
+      0
+    ).getDate();
+
+    const result = [];
+
+    for (let i = 1; i <= daysInMonth; i++) {
+      let padel = 0;
+      let pickleball = 0;
+
+      matches.forEach((match: any) => {
+        if (!match.date) return;
+
+        let matchDate: Date;
+
+        // ✅ HANDLE BOTH STRING & DATE
+        if (typeof match.date === "string") {
+          matchDate = new Date(match.date);
+        } else {
+          matchDate = match.date;
+        }
+
+        // ✅ DEBUG (IMPORTANT)
+        // console.log("Parsed:", match.date, matchDate);
+
+        if (
+          matchDate.getFullYear() === currentYear &&
+          matchDate.getMonth() === currentMonth &&
+          matchDate.getDate() === i
+        ) {
+          const game = match.game?.toLowerCase().trim();
+
+          if (game === "padel") padel++;
+          if (game === "pickleball") pickleball++;
+        }
+      });
+
+      result.push({
+        day: i,
+        padel,
+        pickleball,
+      });
+    }
+
+    console.log("TOTAL MATCHES:", matches.length);
+    console.log("FINAL DATA:", result);
+
+    res.json(result);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error fetching stats" });
   }
 };
