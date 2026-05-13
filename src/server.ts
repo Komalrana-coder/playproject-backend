@@ -15,7 +15,7 @@ connectDB();
 const app = express();
 const port= 8000;
 app.use(cors({
-  origin: "https://projectplay-fronend-4ckob7icc-komal-s-projects1.vercel.app/",
+  origin: "https://projectplay-fronend.vercel.app/",
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
 
 }));
