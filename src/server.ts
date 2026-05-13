@@ -14,12 +14,23 @@ connectDB();
 
 const app = express();
 const port= 8000;
-app.use(cors({
-  origin: "https://projectplay-fronend.vercel.app/",
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+// app.use(cors({
+//   // origin: "https://projectplay-fronend.vercel.app/",
+//   origin:"*",
+//   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
 
-}));
+// }));
 
+app.use(
+  cors({
+    origin: [
+      "https://projectplay-fronend.vercel.app",
+      "http://localhost:3000",
+    ],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    credentials: true,
+  })
+);
 app.post(
   "/webhook",
   express.raw({ type: "application/json" }), 
@@ -43,8 +54,8 @@ app.use("/api/employee",employeeRoutes);
 app.use("/api/venue",venueRoutes);
 app.use("/api/matches",matchesRoutes);
 
+module.exports = app;
 
-
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})
+// app.listen(port, () => {
+//   console.log(`Example app listening on port ${port}`)
+// })
