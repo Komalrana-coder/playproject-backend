@@ -54,8 +54,8 @@ app.use("/api/employee",employeeRoutes);
 app.use("/api/venue",venueRoutes);
 app.use("/api/matches",matchesRoutes);
 
-module.exports = app;
 
-// app.listen(port, () => {
-//   console.log(`Example app listening on port ${port}`)
-// })
+
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`)
+})
