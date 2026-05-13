@@ -28,9 +28,7 @@ export const registerUser = async (req: Request, res: Response) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
   
-    const imagePath = req.file
-      ? `/uploads/${req.file.filename}`
-      : "/uploads/default.jpg";
+    const image = req.file?.path;
 
     const newUser = new User({
       name,
@@ -38,7 +36,7 @@ export const registerUser = async (req: Request, res: Response) => {
       password: hashedPassword,
       phoneNumber,
       city,
-      image: imagePath, 
+      image
     });
 
     await newUser.save();
