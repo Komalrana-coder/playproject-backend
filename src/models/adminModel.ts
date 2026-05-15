@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-
 interface Admin {
   email: string;
   password: string;

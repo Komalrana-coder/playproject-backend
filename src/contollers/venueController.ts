@@ -2,6 +2,7 @@ import { Request,Response } from "express";
 import Venue from "../models/venueModel";
 import mongoose from "mongoose";
 import { error } from "console";
+import cloudinary from "../config/cloudinary";
 
 
 export const addVenue = async (req: Request, res: Response) => {
@@ -16,8 +17,15 @@ export const addVenue = async (req: Request, res: Response) => {
             })
         }
 
-const file = (req as any).file;
-const image = file ? `/uploads/${file.filename}` : "";
+   let imageUrl = "";
+
+      // upload to cloudinary
+      if (req.file) {
+        const result = await cloudinary.uploader.upload(req.file.path);
+
+        imageUrl = result.secure_url;
+      }
+
 
 const newVenue = await Venue.create({
   name,
@@ -31,7 +39,7 @@ const newVenue = await Venue.create({
   employee: JSON.parse(req.body.employee || "[]"),
   courts: JSON.parse(req.body.courts || "[]"),
   games: JSON.parse(req.body.games || "[]"),
-  image,
+  image:imageUrl
 });
        
         console.log("newVenue",newVenue)
@@ -165,45 +173,6 @@ export const getSingleVenue =async(req:Request,res:Response)=>{
 };
 
 
-//update venue
-
-
-//   export const updateVenue = async (req: Request <{ id: string }>, res: Response) => {
-//   try {
-//     const { id } = req.params;
-
-//      if (!mongoose.Types.ObjectId.isValid(id)) {
-//       return res.status(400).json({ message: "Invalid ID" });
-//     }
-//      const { _id, ...updateData } = req.body;
-//   if (req.file) {
-//       updateData.image = `/uploads/${req.file.filename}`;
-//     }
-
-
-//     const updatedVenue = await Venue.findByIdAndUpdate(
-//       id,
-//       req.body,
-//       { new: true } 
-//     );
-
-//     if (!updatedVenue) {
-//       return res.status(404).json({ message: "venue not found" });
-//     }
-
-//     res.json({
-//       message: "Venue updated successfully",
-//       data: updatedVenue,
-//     });
-
-//   } catch (error:any) {
-//     res.status(500).json({ message: error.message });
-//   }
-// };
-
-
-
-
 export const updateVenue = async (req: Request, res: Response) => {
   try {
     const body = req.body;
@@ -224,10 +193,13 @@ export const updateVenue = async (req: Request, res: Response) => {
     };
 
     //  HANDLE IMAGE SAFELY
-    const file = (req as any).file;
+   
 
-    if (file) {
-      updateData.image = `/uploads/${file.filename}`;
+    if (req.file) {
+    
+      const result = await cloudinary.uploader.upload(req.file.path);
+    
+      updateData.image = result.secure_url;
     }
 
     const updatedVenue = await Venue.findByIdAndUpdate(
@@ -240,7 +212,7 @@ export const updateVenue = async (req: Request, res: Response) => {
 
   } catch (err: any) {
     console.log("ERROR:", err);
-    res.status(500).json({ error: err.message }); // ✅ fix error response
+    res.status(500).json({ error: err.message });
   }
 };
 

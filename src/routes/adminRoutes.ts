@@ -2,7 +2,9 @@ import express from "express";
 import { addEmployee, adminLogin, createAdmin, getEmployee, getSingleEmployee,
      getSingleUser, getUsers, updateEmployee }
 from "../contollers/adminController";
-import { upload } from "../middlewares/multer.middleware";
+import upload from "../middlewares/multer.middleware";
+
+
 
 const router = express.Router();
 

@@ -24,7 +24,7 @@ const employeeSchema = new mongoose.Schema<Employee>({
   },
    image: {
   type: String,
-  default: "/uploads/default.jpg",
+  
 },
   password: {
     type: String,

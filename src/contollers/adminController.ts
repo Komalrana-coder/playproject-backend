@@ -5,6 +5,7 @@ import Employee from "../models/employee";
 import User from "../models/userModel";
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
+import cloudinary from "../config/cloudinary";
 
 
 
@@ -110,7 +111,6 @@ return res.status(404).json({
 
 
 // add employee
-
 export const addEmployee = async (req: Request, res: Response) => {
     try {
         const {name,email, password,phoneNumber,status}=req.body;
@@ -128,21 +128,31 @@ export const addEmployee = async (req: Request, res: Response) => {
                 message: "email already exists"
             })
         }
-          const imagePath = req.file
-      ? `/uploads/${req.file.filename}`
-      : "/uploads/default.jpg";
+           
+        let imageUrl = "";
 
-        const hashedPassword = await bcrypt.hash(password, 10);
+    if (req.file) {
+      console.log("Uploading to cloudinary...");
+
+ const result = await cloudinary.uploader.upload(req.file.path);
+
+      console.log( result);
+
+       imageUrl = result.secure_url;
+      
+    }
+    const hashedPassword = await bcrypt.hash(password, 10);
         const newEmployee = new Employee({
             name,
             email,
-            password: hashedPassword,
+            password:hashedPassword,
             phoneNumber,
             status,
-            image:imagePath,
+            image:imageUrl,
            
         });
         await newEmployee.save();
+        console.log(req.file);
 
         return res.status(201).json({
             success: true,
@@ -226,8 +236,6 @@ export const getSingleEmployee =async(req:Request,res:Response)=>{
 
 
 // UPDATE EMPLOYEE
-
-
   export const updateEmployee = async (req: Request <{ id: string }>, res: Response) => {
   try {
     const { id } = req.params;
@@ -237,9 +245,12 @@ export const getSingleEmployee =async(req:Request,res:Response)=>{
     }
     const updateData: any = { ...req.body };
 
-    if (req.file) {
-      updateData.image = `/uploads/${req.file.filename}`;
-    }
+   if (req.file) {
+
+  const result = await cloudinary.uploader.upload(req.file.path);
+
+  updateData.image = result.secure_url;
+}
 
 
     const updatedEmployee = await Employee.findByIdAndUpdate(

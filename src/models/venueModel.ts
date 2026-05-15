@@ -29,7 +29,7 @@ const venueSchema = new Schema<venue>({
   }, 
   image:{
     type:String,
-    default: "uploads/default.jpg",
+   
   },
   city:{
     type:String, 

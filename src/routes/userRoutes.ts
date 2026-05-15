@@ -1,6 +1,7 @@
 import express from "express";
 import { registerUser, userLogin,profile, updateUser} from "../contollers/userController";
-import { upload } from "../middlewares/multer.middleware"; 
+import upload from "../middlewares/multer.middleware";
+
 
 
 const router = express.Router();

@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import { Request, Response } from "express";
 import User from "../models/userModel";
 import mongoose from "mongoose";
+import cloudinary from "../config/cloudinary";
 const jwt = require("jsonwebtoken");
 
 
@@ -28,7 +29,16 @@ export const registerUser = async (req: Request, res: Response) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
   
-    const image = req.file?.path;
+     let imageUrl = "";
+
+      // upload to cloudinary
+      if (req.file) {
+        const result = await cloudinary.uploader.upload(req.file.path);
+
+        console.log(result);
+
+        imageUrl = result.secure_url;
+      }
 
     const newUser = new User({
       name,
@@ -36,7 +46,7 @@ export const registerUser = async (req: Request, res: Response) => {
       password: hashedPassword,
       phoneNumber,
       city,
-      image
+      image:imageUrl
     });
 
     await newUser.save();
@@ -145,7 +155,10 @@ export const updateUser = async (req: Request, res: Response) => {
 
 
     if (req.file) {
-      updateData.image = `/uploads/${req.file.filename}`;
+    
+      const result = await cloudinary.uploader.upload(req.file.path);
+    
+      updateData.image = result.secure_url;
     }
 
     const updatedUser = await User.findByIdAndUpdate(

@@ -1,7 +1,8 @@
 import express from "express"
 
 import { addVenue, getSingleVenue, getVenue,  removeVenueEmp, updateVenue } from "../contollers/venueController";
-import { upload } from "../middlewares/multer.middleware"; 
+import upload from "../middlewares/multer.middleware";
+
 
 
 
