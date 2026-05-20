@@ -4,7 +4,6 @@ import {  changePassword, forgetPassword, resetPassword, verifyOtp } from "../co
 const router = express.Router();
 
 router.post("/forgetPassword", forgetPassword);
-
  router.post("/resetPassword",resetPassword)
   router.post("/verifyOtp",verifyOtp)
  router.post("/changePassword",changePassword)

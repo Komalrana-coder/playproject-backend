@@ -86,7 +86,6 @@ return res.status(404).json({
   }
 
 //create token
-  
  const token = jwt.sign(
     {
       id: user._id,
