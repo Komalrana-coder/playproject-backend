@@ -274,7 +274,7 @@ export const checkUser = async (req: Request, res: Response) => {
 
 
 export const getMonthlyStats = async (req: Request, res: Response) => {
-  console.log("API HIT ✅");
+  console.log("API HIT ");
   try {
     const matches = await Booking.find();
     const now = new Date();
